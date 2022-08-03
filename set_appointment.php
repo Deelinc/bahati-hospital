@@ -1,0 +1,65 @@
+<?php
+include ('admin/db_connect.php')
+?>
+<style>
+	#uni_modal .modal-footer{
+		display: none
+	}
+</style>
+<div class="container-fluid">
+        <div class="col-lg-12">
+            <div ></div>
+            <form action="https://formspree.io/f/mqkjzlrz" id="manage-appointment" method="POST">
+                <input type="hidden" name="doctor_id" value="<?php echo $_GET['id'] ?>">
+                <div class="form-group">
+                    <label for="" class="control-label">Date</label>
+                    <input type="date" value="" name="date" class="form-control" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="" class="control-label">Time</label>
+                    <input type="time" value="" name="time" class="form-control" required>
+                </div>
+    
+                <hr>
+                <div class="col-md-12 text-center">
+                    <button class="btn-primary btn btn-sm col-md-4" type="submit">Request</button>
+                    <button class="btn btn-secondary btn-sm col-md-4  " type="button" data-dismiss="modal" id="">Close</button>
+                </div>
+            </form>
+        </div>
+        <div class="my-form-status"></div>
+    </div>
+    
+    <script>
+        var form = document.getElementById("manage-appointment");
+        
+        async function handleSubmit(event) {
+          event.preventDefault();
+          var status = document.getElementById("my-form-status");
+          var data = new FormData(event.target);
+          fetch(event.target.action, {
+            method: form.method,
+            body: data,
+            headers: {
+                'Accept': 'application/json'
+            }
+          }).then(response => {
+            if (response.ok) {
+              status.innerHTML = "Appointment booked successfully!";
+              form.reset()
+            } else {
+              response.json().then(data => {
+                if (Object.hasOwn(data, 'errors')) {
+                  status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+                } else {
+                  status.innerHTML = "Oops! There was a problem submitting your request"
+                }
+              })
+            }
+          }).catch(error => {
+            status.innerHTML = "Oops! There was a problem submitting your request"
+          });
+        }
+        form.addEventListener("submit", handleSubmit)
+    </script>
